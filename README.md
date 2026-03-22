@@ -170,7 +170,7 @@ skill-tracker/
 ## 👨‍💻 Author
 
 **Shivansh Gupta**
-- Instagram: [@your_handle](https://instagram.com)
+- Instagram: [@flowkraftai](https://www.instagram.com/flowkraftai)
 - GitHub: [@shivanshgupta01](https://github.com/shivanshgupta01)
 
 ---
