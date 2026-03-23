@@ -116,40 +116,24 @@ function AIResources({ skill, onClose }) {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
-    "x-api-key": import.meta.env.VITE_ANTHROPIC_KEY,
-    "anthropic-version": "2023-06-01",
-    "anthropic-dangerous-direct-browser-access": "true"
+    "Authorization": `Bearer ${import.meta.env.VITE_GROQ_KEY}`
   },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 1000,
-            messages: [{
-              role: "user",
-              content: `You are a learning advisor. For the skill "${skill.name}" (category: ${skill.category}), the learner has spent ${fmtHours(skill.totalMins)} learning so far.
-
-Return ONLY a JSON object (no markdown, no backticks) with this exact structure:
-{
-  "level": "beginner|intermediate|advanced",
-  "tip": "one short personalized tip based on their current hours",
-  "resources": [
-    {"type": "Book", "title": "...", "why": "one sentence why"},
-    {"type": "YouTube", "title": "...", "why": "one sentence why"},
-    {"type": "Website", "title": "...", "why": "one sentence why"},
-    {"type": "Practice", "title": "...", "why": "one sentence why"}
-  ],
-  "nextGoal": "a specific actionable next milestone for them"
-}`
-            }]
-          })
-        });
-        const data = await response.json();
-        const text = data.content?.[0]?.text || "";
-        const clean = text.replace(/```json|```/g, "").trim();
-        setResources(JSON.parse(clean));
+  body: JSON.stringify({
+    model: "llama-3.1-8b-instant",
+    messages: [{
+      role: "user",
+      content: `You are a learning advisor. For the skill "${skill.name}" (category: ${skill.category}), the learner has spent ${fmtHours(skill.totalMins)} learning so far. Return ONLY raw JSON no markdown no backticks: {"level":"beginner|intermediate|advanced","tip":"one short personalized tip based on their current hours","resources":[{"type":"Book","title":"...","why":"one sentence why"},{"type":"YouTube","title":"...","why":"one sentence why"},{"type":"Website","title":"...","why":"one sentence why"},{"type":"Practice","title":"...","why":"one sentence why"}],"nextGoal":"a specific actionable next milestone for them"}`
+    }]
+  })
+});
+const data = await response.json();
+const text = data.choices?.[0]?.message?.content || "";
+const clean = text.replace(/```json|```/g, "").trim();
+setResources(JSON.parse(clean));
       } catch (e) {
         setError("Couldn't load AI suggestions. Check your connection.");
       } finally {
